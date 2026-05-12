@@ -19,10 +19,11 @@ In order to run this project locally, simply fork and clone the repository or do
 - Go to terminal -> New terminal (If you are using VS code)
 - Split your terminal into two (run the Frontend on one terminal and the server on the other terminal)
 
+
 ```
-#  ---  Config.env  ---
-PORT =8070
-MONGO_URL =
+#  ---  Backend Add .env file ---
+PORT=8070
+MONGO_URL=
 ```
 
 In the first terminal
