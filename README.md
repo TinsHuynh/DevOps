@@ -19,30 +19,24 @@ In order to run this project locally, simply fork and clone the repository or do
 - Go to terminal -> New terminal (If you are using VS code)
 - Split your terminal into two (run the Frontend on one terminal and the server on the other terminal)
 
-In the first terminal
-
-```
-$ cd Fronted
-$ npm install (to install Frontend-side dependencies)
-$ npm run dev(to start the Frontend)
-```
-
-In the second terminal
-
-- cd Backend and Set environment variables in .env
-- Create your mongoDB connection url, which you'll use as your MONGO_URL
-- Supply the following credentials
-
 ```
 #  ---  Config.env  ---
 PORT =8070
 MONGO_URL =
 ```
-```
-# --- Terminal ---
 
+In the first terminal
+```
+$ cd Backend
 $ npm install (to install backend-side dependencies)
-$ npm start (to start the backend)
+$ npm run dev (to start the backend)
+```
+
+In the second terminal
+```
+$ cd Frontend
+$ npm install (to install Frontend-side dependencies)
+$ npm start (to start the Frontend)
 ```
 
 ##  Key Features
