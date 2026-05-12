@@ -3,7 +3,7 @@ import "../App.css";
 class CounterClass extends React.Component {
   constructor() {
     super();
-    this.increament = this.increament.bind(this);
+    this.increment = this.increment.bind(this);
     this.decrement = this.decrement.bind(this);
     this.reset = this.reset.bind(this);
     this.state = {
@@ -11,7 +11,7 @@ class CounterClass extends React.Component {
     };
   }
 
-  increament() {
+  increment() {
     this.setState({
       number: this.state.number + 1,
     });
@@ -32,9 +32,9 @@ class CounterClass extends React.Component {
   render() {
     return (
       <div>
-        <h2 className="countClass">Class Base Approch</h2>
+        <h2 className="countClass">Class Base Approach</h2>
         <h2>Counter = {this.state.number}</h2>
-        <button onClick={this.increament}>+</button>{" "}
+        <button onClick={this.increment}>+</button>{" "}
         <button onClick={this.decrement}>-</button>{" "}
         <button onClick={this.reset}>Reset</button>
       </div>

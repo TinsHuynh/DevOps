@@ -7,7 +7,7 @@ const studentSchema = new Schema({
     type: String,
     required: true,
   },
-  nim: {
+  studentId: {
     type: Number,
     required: true,
   },

@@ -35,7 +35,7 @@ function Header() {
               </li>
               <li className="nav-item">
                 <a className="nav-link active" href="/add-student">
-                  Create Student
+                  Add Student
                 </a>
               </li>
             </ul>

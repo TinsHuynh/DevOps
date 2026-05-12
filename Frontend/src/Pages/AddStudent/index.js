@@ -5,15 +5,15 @@ import { useNavigate } from "react-router-dom";
 
 export default function AddStudent() {
   const [name, setName] = useState("");
-  const [nim, setNim] = useState(0);
+  const [studentId, setStudentId] = useState(0);
   const [gender, setGender] = useState("");
   const navigate = useNavigate();
 
-  const sentData = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const newStudent = {
       name,
-      nim,
+      studentId,
       gender,
     };
 
@@ -27,7 +27,7 @@ export default function AddStudent() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .post("https://sttiss-api.vercel.app/student/add", newStudent)
+          .post("http://localhost:8070/student/add", newStudent)
           .then(() => {
             Swal.fire("Student has been successfully Saved!", "", "success");
             navigate("/");
@@ -63,16 +63,16 @@ export default function AddStudent() {
           />
         </div>
         <div className="mb-3">
-          <label for="nim" className="form-label">
-            Student Nim
+          <label for="studentId" className="form-label">
+            Student ID
           </label>
           <input
             type="number"
             className="form-control"
-            id="nim"
-            placeholder="Enter Your Nim"
+            id="studentId"
+            placeholder="Enter Student ID"
             onChange={(e) => {
-              setNim(e.target.value);
+              setStudentId(e.target.value);
             }}
           />
         </div>
@@ -114,7 +114,7 @@ export default function AddStudent() {
         </div>
         <br />
         <div className="col-12">
-          <button className="btn btn-primary" type="submit" onClick={sentData}>
+          <button className="btn btn-primary" type="submit" onClick={handleSubmit}>
             Submit
           </button>
         </div>

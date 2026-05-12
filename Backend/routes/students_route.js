@@ -5,13 +5,13 @@ let student = require('../models/student');
 //http//localhost:8070/student/add
 router.route('/add').post((req, res) => {
   const name = req.body.name;
-  const nim = Number(req.body.nim);
+  const studentId = Number(req.body.studentId);
   const gender = req.body.gender;
 
   //send this object through model to mongodb to store it in the database
   const newStudent = new student({
     name,
-    nim,
+    studentId,
     gender,
   });
 
@@ -36,11 +36,11 @@ router.route('/get').get((req, res) => {
 //https//localhost:8070/student/update/:sid
 router.route('/update/:sid').put(async (req, res) => {
   let userID = req.params.sid;
-  const { name, nim, gender } = req.body;
+  const { name, studentId, gender } = req.body;
 
   const updateStudent = {
     name,
-    nim,
+    studentId,
     gender,
   };
 
