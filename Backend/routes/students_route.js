@@ -1,99 +1,58 @@
 const router = require('express').Router();
 const Student = require('../models/student');
-let student = require('../models/student');
 
-//http//localhost:8070/student/add
-router.route('/add').post((req, res) => {
-  const name = req.body.name;
-  const studentId = Number(req.body.studentId);
-  const gender = req.body.gender;
+// GET /api/students
+router.route('/').get((req, res) => {
+  Student.find()
+    .then((students) => res.json(students))
+    .catch((err) => res.status(400).json('Error: ' + err.message));
+});
 
-  //send this object through model to mongodb to store it in the database
-  const newStudent = new student({
-    name,
-    studentId,
-    gender,
+// POST /api/students
+router.route('/').post((req, res) => {
+  const { studentId, name, dob, gender, studentClass, major } = req.body;
+
+  const newStudent = new Student({
+    studentId, name, dob, gender, studentClass, major
   });
 
-  newStudent
-    .save()
-    .then(() => {
-      res.json('Student Added Successfully');
-    })
-    .catch((err) => console.log(err.message));
+  newStudent.save()
+    .then((student) => res.status(201).json(student))
+    .catch((err) => res.status(400).json('Error: ' + err.message));
 });
 
-//https//localhost:8070/get/student/
-router.route('/get').get((req, res) => {
-  student
-    .find()
-    .then((students) => {
-      res.json(students);
-    })
-    .catch((err) => console.log(err.message));
+// PUT /api/students/:id
+router.route('/:id').put(async (req, res) => {
+  const { studentId, name, dob, gender, studentClass, major } = req.body;
+
+  try {
+    const updatedStudent = await Student.findByIdAndUpdate(req.params.id, {
+      studentId, name, dob, gender, studentClass, major
+    }, { new: true });
+    res.json(updatedStudent);
+  } catch (err) {
+    res.status(400).json('Error: ' + err.message);
+  }
 });
 
-//https//localhost:8070/student/update/:sid
-router.route('/update/:sid').put(async (req, res) => {
-  let userID = req.params.sid;
-  const { name, studentId, gender } = req.body;
-
-  const updateStudent = {
-    name,
-    studentId,
-    gender,
-  };
-
-  const update = await Student.findByIdAndUpdate(userID, updateStudent)
-    .then(() => {
-      res.status(200).send({
-        status: 'User Updated',
-      });
-    })
-    .catch((err) => {
-      console.log(err.message);
-      res.status(500).send({
-        status: 'Server Error with updating data',
-        error: err.message,
-      });
-    });
+// DELETE /api/students/:id
+router.route('/:id').delete(async (req, res) => {
+  try {
+    await Student.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Student deleted.' });
+  } catch (err) {
+    res.status(400).json('Error: ' + err.message);
+  }
 });
 
-//https//localhost:8070/student/delete/:sid
-router.route('/delete/:sid').delete(async (req, res) => {
-  let uId = req.params.sid;
-  await Student.findByIdAndDelete(uId)
-    .then(() => {
-      res.status(200).send({
-        status: 'user Deleted',
-      });
-    })
-    .catch((err) => {
-      console.log(err.message);
-      res.status(500).send({
-        status: 'Error with deleting user',
-        error: err.message,
-      });
-    });
-});
-
-//https//localhost:8070/student/get/:sid
-router.route('/get/:sid').get(async (req, res) => {
-  const uID = req.params.sid;
-  const user = await Student.findById(uID)
-    .then((user) => {
-      res.status(200).send({
-        status: 'User Fetched',
-        user,
-      });
-    })
-    .catch((err) => {
-      console.log(err.message);
-      res.status(500).send({
-        status: 'Error with fetch user',
-        error: err.message,
-      });
-    });
+// GET /api/students/:id
+router.route('/:id').get(async (req, res) => {
+  try {
+    const student = await Student.findById(req.params.id);
+    res.json(student);
+  } catch (err) {
+    res.status(400).json('Error: ' + err.message);
+  }
 });
 
 module.exports = router;
