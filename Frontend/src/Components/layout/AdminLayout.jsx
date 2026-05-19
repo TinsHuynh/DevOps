@@ -16,7 +16,17 @@ const AdminLayout = ({ children, currentView, onViewChange }) => {
     {
       id: 'students',
       label: 'Quản Lý Sinh Viên',
-      icon: 'fas fa-users',
+      icon: 'fas fa-user-graduate',
+    },
+    {
+      id: 'teachers',
+      label: 'Quản Lý Giáo Viên',
+      icon: 'fas fa-chalkboard-teacher',
+    },
+    {
+      id: 'categories',
+      label: 'Quản Lý Danh Mục',
+      icon: 'fas fa-layer-group',
     },
     {
       id: 'accounts',
@@ -27,6 +37,11 @@ const AdminLayout = ({ children, currentView, onViewChange }) => {
       id: 'notifications',
       label: 'Thông Báo Hệ Thống',
       icon: 'fas fa-bell',
+    },
+    {
+      id: 'logs',
+      label: 'Nhật Ký Hoạt Động',
+      icon: 'fas fa-history',
     },
   ];
 
