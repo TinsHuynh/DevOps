@@ -1,75 +1,98 @@
 # Các chức năng cần thêm cho hệ thống
 
-Tài liệu này mô tả các chức năng cần bổ sung cho hệ thống quản lý sinh viên, bao gồm 4 trang chính: đăng nhập, học sinh, giáo viên và admin.
+Tài liệu này được chuyển sang dạng phase + todo checklist để theo dõi trực tiếp những gì đã hoàn thành trong code hiện tại, những gì mới ở mức demo UI, và những phần còn thiếu cần làm tiếp.
 
-## 1. Trang đăng nhập
+## Trạng thái tổng quan
 
-Mục tiêu của trang này là xác thực người dùng trước khi vào hệ thống.
+- [x] Đã có trang đăng nhập và phân quyền theo vai trò.
+- [x] Đã có router riêng cho student, teacher, admin và route bảo vệ.
+- [x] Đã có CRUD sinh viên ở admin.
+- [~] Student, teacher và admin dashboard đã có UI và dữ liệu mẫu/demonstration.
+- [ ] Các API nghiệp vụ sâu hơn như điểm số, lịch học, thông báo, nhật ký hoạt động chưa được nối đầy đủ.
 
-Chức năng cần có:
+## Phase 1 - Xác thực và phân quyền
 
-- Đăng nhập bằng tài khoản và mật khẩu.
-- Kiểm tra dữ liệu đầu vào hợp lệ trước khi gửi yêu cầu.
-- Phân quyền sau khi đăng nhập thành công theo vai trò người dùng.
-- Hiển thị thông báo lỗi khi sai tài khoản, sai mật khẩu hoặc tài khoản bị khóa.
-- Cho phép ghi nhớ đăng nhập nếu cần.
-- Hỗ trợ đăng xuất và tự động chuyển về màn hình đăng nhập khi phiên làm việc hết hạn.
+Mục tiêu: đưa người dùng vào đúng không gian theo vai trò và quản lý phiên đăng nhập ổn định.
 
+- [x] Đăng nhập bằng tài khoản và mật khẩu.
+- [x] Kiểm tra dữ liệu đầu vào bắt buộc trước khi gửi request.
+- [x] Trả lỗi rõ ràng khi sai tài khoản, sai mật khẩu hoặc tài khoản bị khóa.
+- [x] Phân quyền sau khi đăng nhập thành công theo role.
+- [x] Ghi nhớ đăng nhập bằng `localStorage` hoặc `sessionStorage`.
+- [x] Tự động đăng xuất khi phiên hết hạn.
+- [x] Hỗ trợ đăng xuất thủ công.
+- [x] Điều hướng về trang phù hợp theo role.
+- [x] Bảo vệ route theo quyền truy cập.
 
-## 2. Trang học sinh
+Ghi chú trạng thái: phase này đã hoàn thành ở mức chạy được, cả frontend lẫn backend đều đã có luồng xác thực cơ bản.
 
-Mục tiêu của trang này là hỗ trợ học sinh xem và quản lý thông tin cá nhân của mình.
+## Phase 2 - Trang học sinh
 
-Chức năng cần có:
+Mục tiêu: hiển thị thông tin cá nhân và các nội dung liên quan đến học tập của học sinh.
 
-- Xem thông tin cá nhân của học sinh.
-- Cập nhật thông tin cơ bản như họ tên, ngày sinh, lớp, số điện thoại và địa chỉ.
-- Xem danh sách lớp học hoặc môn học đang theo học.
-- Xem điểm số, kết quả học tập hoặc trạng thái học tập nếu hệ thống có lưu dữ liệu này.
-- Tra cứu thông báo từ nhà trường hoặc giáo viên.
-- Đổi mật khẩu cá nhân.
-- Xem lịch học, lịch kiểm tra hoặc các mốc quan trọng khác.
+- [~] Xem thông tin cá nhân của học sinh.
+- [~] Cập nhật họ tên, ngày sinh, lớp, số điện thoại, địa chỉ.
+- [~] Xem danh sách môn học đang theo học.
+- [~] Xem điểm số và trạng thái học tập.
+- [~] Xem thông báo từ nhà trường hoặc giáo viên.
+- [~] Xem lịch học gần nhất.
+- [~] Đổi mật khẩu cá nhân.
+- [ ] Đồng bộ dữ liệu học sinh với backend theo tài khoản thật.
+- [ ] Xem lịch kiểm tra và các mốc học tập từ nguồn dữ liệu thật.
 
-## 3. Trang giáo viên
+Ghi chú trạng thái: giao diện và luồng thao tác đã có, nhưng phần lớn đang dùng dữ liệu mẫu trên frontend.
 
-Mục tiêu của trang này là hỗ trợ giáo viên quản lý lớp học và theo dõi học sinh.
+## Phase 3 - Trang giáo viên
 
-Chức năng cần có:
+Mục tiêu: hỗ trợ giáo viên theo dõi lớp học và thực hiện các thao tác nhanh.
 
-- Xem danh sách lớp hoặc môn học được phân công.
-- Xem danh sách học sinh trong từng lớp.
-- Cập nhật điểm số, nhận xét hoặc trạng thái học tập cho học sinh.
-- Điểm danh hoặc ghi nhận tình trạng chuyên cần.
-- Gửi thông báo cho lớp hoặc từng học sinh.
-- Tạo, sửa, xóa bài kiểm tra hoặc nội dung học tập nếu cần.
-- Xem thống kê nhanh về sĩ số, tỷ lệ chuyên cần và kết quả học tập.
+- [~] Xem danh sách lớp hoặc môn học được phân công.
+- [~] Xem danh sách học sinh trong lớp.
+- [~] Điểm danh hoặc ghi nhận tình trạng chuyên cần.
+- [~] Gửi thông báo cho lớp.
+- [~] Xem thống kê nhanh về sĩ số và chuyên cần.
+- [~] Ghi nhận nhận xét/ghi chú mẫu trên giao diện.
+- [ ] Cập nhật điểm số và nhận xét vào backend.
+- [ ] Quản lý bài kiểm tra hoặc nội dung học tập.
+- [ ] Đồng bộ dữ liệu lớp, học sinh và chuyên cần với API thật.
 
-## 4. Trang admin
+Ghi chú trạng thái: phase này đã có dashboard và tương tác demo, nhưng chưa phải quy trình nghiệp vụ đầy đủ.
 
-Mục tiêu của trang này là quản trị toàn bộ hệ thống.
+## Phase 4 - Trang admin
 
-Chức năng cần có:
+Mục tiêu: quản trị tài khoản, phân quyền và các dữ liệu hệ thống.
 
-- Quản lý tài khoản người dùng gồm học sinh, giáo viên và admin.
-- Phân quyền và thay đổi vai trò người dùng.
-- Thêm, sửa, xóa dữ liệu học sinh.
-- Thêm, sửa, xóa dữ liệu giáo viên.
-- Quản lý lớp học, khoa, môn học hoặc các danh mục liên quan.
-- Xem dashboard tổng quan với các số liệu thống kê quan trọng.
-- Quản lý thông báo hệ thống.
-- Theo dõi nhật ký hoạt động nếu cần bảo mật và kiểm soát.
+- [x] Xem dashboard tổng quan với các chỉ số chính.
+- [x] Xem danh sách tài khoản người dùng.
+- [x] Thay đổi vai trò người dùng.
+- [x] Thêm, sửa, xóa dữ liệu sinh viên.
+- [~] Quản lý thông báo hệ thống ở mức giao diện.
+- [~] Theo dõi nhật ký hoạt động ở mức demo.
+- [ ] Thêm, sửa, xóa dữ liệu giáo viên.
+- [ ] Quản lý lớp học, khoa, môn học hoặc danh mục liên quan.
+- [ ] Lưu thông báo hệ thống xuống backend.
+- [ ] Kết nối nhật ký hoạt động với nguồn dữ liệu thật.
 
-## 5. Gợi ý phân chia module
+Ghi chú trạng thái: phần quản trị người dùng và CRUD sinh viên đã hoàn thành, các module quản trị mở rộng vẫn còn thiếu.
 
-- Trang đăng nhập: dùng chung cho toàn hệ thống.
-- Trang học sinh: chỉ hiển thị dữ liệu cá nhân và chức năng liên quan đến học sinh.
-- Trang giáo viên: tập trung vào lớp học, điểm số và học sinh được quản lý.
-- Trang admin: chứa toàn bộ chức năng quản trị và phân quyền.
+## Phase 5 - Hoàn thiện backend và kiến trúc
 
-## 6. Hướng phát triển tiếp theo
+Mục tiêu: chuẩn hóa luồng dữ liệu giữa frontend và backend để các màn hình không còn phụ thuộc demo data.
 
-- Xây dựng router riêng cho từng vai trò.
-- Tạo middleware kiểm tra đăng nhập và phân quyền.
-- Thiết kế giao diện riêng cho từng trang.
-- Tách API backend theo từng nhóm chức năng.
-- Bổ sung thông báo, xác nhận và xử lý lỗi đồng bộ giữa frontend và backend.
+- [x] Có API đăng nhập `/api/auth/login`.
+- [x] Có API danh sách, thêm, sửa, xóa người dùng.
+- [x] Có API danh sách, thêm, sửa, xóa sinh viên.
+- [x] Có middleware/route bảo vệ ở mức frontend.
+- [ ] Tách API riêng cho học sinh, giáo viên, admin theo nghiệp vụ.
+- [ ] Bổ sung middleware kiểm tra đăng nhập và quyền ở backend.
+- [ ] Chuẩn hóa xử lý lỗi và thông báo giữa frontend và backend.
+- [ ] Đồng bộ dữ liệu thật cho profile, lịch học, điểm số, thông báo và nhật ký.
+
+## Danh sách todo nên làm tiếp
+
+- [ ] Nối student dashboard với API thật.
+- [ ] Nối teacher dashboard với API thật.
+- [ ] Thêm màn hình quản lý giáo viên.
+- [ ] Thêm module quản lý lớp, khoa, môn học.
+- [ ] Gắn thông báo hệ thống và nhật ký hoạt động vào backend.
+- [ ] Bổ sung test cho luồng đăng nhập, phân quyền và CRUD chính.
