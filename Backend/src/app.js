@@ -8,6 +8,7 @@ const notificationRoutes = require('./routes/notification.routes');
 const activityLogRoutes = require('./routes/activitylog.routes');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const categoryRoutes = require('./routes/category.routes');
 
 dotenv.config();
 
@@ -22,5 +23,6 @@ app.use('/api/students', studentRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/logs', activityLogRoutes);
+app.use('/api/categories', categoryRoutes);
 
 module.exports = app;

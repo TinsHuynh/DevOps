@@ -32,6 +32,7 @@ const StudentTable = ({ students, onEdit, onDelete }) => {
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Giới tính</th>
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Lớp</th>
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Ngành học</th>
+              <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Khoa</th>
               <th className="px-6 py-5 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">Thao tác</th>
             </tr>
           </thead>
@@ -57,6 +58,7 @@ const StudentTable = ({ students, onEdit, onDelete }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{student.studentClass}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{student.major}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{student.department || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex justify-end space-x-2">
                     <button

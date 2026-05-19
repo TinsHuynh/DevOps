@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import categoryService from '../../../services/categoryService';
 
 const TeacherForm = ({ initialData, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -13,11 +14,49 @@ const TeacherForm = ({ initialData, onSubmit, onCancel }) => {
     status: 'active',
   });
 
+  const [departments, setDepartments] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await categoryService.fetchCategories();
+        const activeData = data.filter((c) => c.status === 'active');
+        
+        const depts = activeData.filter((c) => c.type === 'Khoa');
+        const specs = activeData.filter((c) => c.type === 'Ngành học');
+
+        setDepartments(depts);
+        setSpecializations(specs);
+
+        // Prepopulate default selection if creating new
+        if (!initialData) {
+          setFormData((prev) => ({
+            ...prev,
+            department: depts[0]?.name || '',
+            specialization: specs[0]?.name || '',
+          }));
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải danh mục cho giáo viên:', error);
+      }
+    };
+
+    loadCategories();
+  }, [initialData]);
+
   useEffect(() => {
     if (initialData) {
       setFormData({
-        ...initialData,
+        teacherId: initialData.teacherId || '',
+        name: initialData.name || '',
         dob: initialData.dob ? new Date(initialData.dob).toISOString().split('T')[0] : '',
+        gender: initialData.gender || 'Nam',
+        department: initialData.department || '',
+        email: initialData.email || '',
+        phone: initialData.phone || '',
+        specialization: initialData.specialization || '',
+        status: initialData.status || 'active',
       });
     }
   }, [initialData]);
@@ -125,33 +164,48 @@ const TeacherForm = ({ initialData, onSubmit, onCancel }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Khoa <span className="text-red-500">*</span>
+            Khoa giảng dạy <span className="text-red-500">*</span>
           </label>
           <select
             name="department"
             value={formData.department}
             onChange={handleChange}
+            required
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
           >
-            <option value="">Chọn khoa</option>
-            <option value="Công nghệ thông tin">Công nghệ thông tin</option>
-            <option value="Kinh tế">Kinh tế</option>
-            <option value="Khoa học cơ bản">Khoa học cơ bản</option>
-            <option value="Ngoại ngữ">Ngoại ngữ</option>
+            {departments.length === 0 ? (
+              <option value="">-- Chưa có khoa nào trong danh mục --</option>
+            ) : (
+              departments.map((c) => (
+                <option key={c._id || c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))
+            )}
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Chuyên ngành
+            Chuyên ngành / Ngành học <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
+          <select
             name="specialization"
             value={formData.specialization}
             onChange={handleChange}
+            required
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm"
-          />
+          >
+            {specializations.length === 0 ? (
+              <option value="">-- Chưa có chuyên ngành nào trong danh mục --</option>
+            ) : (
+              specializations.map((c) => (
+                <option key={c._id || c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))
+            )}
+          </select>
         </div>
 
         <div>

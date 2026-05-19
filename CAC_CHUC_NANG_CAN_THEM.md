@@ -13,7 +13,7 @@ Tài liệu này được chuyển sang dạng phase + todo checklist để theo
 - [x] Đã có quản lý thông báo nối backend (NotificationsView).
 - [x] Đã có nhật ký hoạt động nối backend (ActivityLogsView).
 - [~] Student, teacher dashboard đã có UI và dữ liệu mẫu/demonstration.
-- [~] CategoriesView đang dùng dữ liệu mẫu local, chưa có backend.
+- [x] CategoriesView đã được kết nối với backend API thật (Khoa, Lớp học, Môn học, Ngành học).
 - [ ] Các API nghiệp vụ sâu hơn như điểm số, lịch học chưa được nối.
 
 ## Phase 1 - Xác thực và phân quyền
@@ -75,7 +75,7 @@ Mục tiêu: quản trị tài khoản, phân quyền và các dữ liệu hệ 
 - [x] Thêm, sửa, xóa dữ liệu giáo viên (TeachersView + API đầy đủ).
 - [x] Lưu thông báo hệ thống xuống backend (NotificationsView nối API).
 - [x] Kết nối nhật ký hoạt động với nguồn dữ liệu thật (ActivityLogsView nối API).
-- [~] Quản lý danh mục (lớp, khoa, môn học) ở mức giao diện demo — **chưa có backend**.
+- [x] Quản lý danh mục (lớp, khoa, môn học, ngành học) kết nối với backend API thật.
 
 Ghi chú trạng thái: hầu hết admin đã hoàn thành. Còn lại duy nhất là CategoriesView chưa nối backend.
 
@@ -97,7 +97,7 @@ Mục tiêu: chuẩn hóa luồng dữ liệu giữa frontend và backend để 
 ## Danh sách todo còn lại (ưu tiên)
 
 - [ ] **[Backend]** Thêm middleware xác thực JWT để bảo vệ các route `/api/teachers`, `/api/notifications`, `/api/logs` — hiện tại `req.user` luôn là `undefined`.
-- [ ] **[Admin]** Nối CategoriesView (quản lý lớp, khoa, môn học) với backend API thật.
+- [x] **[Admin]** Nối CategoriesView (quản lý lớp, khoa, môn học) với backend API thật.
 - [ ] **[Student]** Nối StudentDashboard với API thật (profile, thông báo published, lịch học).
 - [ ] **[Teacher]** Nối TeacherDashboard với API thật (danh sách lớp, điểm danh, cập nhật điểm).
 - [ ] **[Backend]** Chuẩn hóa xử lý lỗi (error handler middleware tập trung).
