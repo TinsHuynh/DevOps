@@ -1,19 +1,14 @@
 import React from 'react';
 
 const Badge = ({ type, text }) => {
-  const styles = {
-    Nam: 'bg-green-100 text-green-800',
-    'Nữ': 'bg-pink-100 text-pink-800',
-    default: 'bg-gray-100 text-gray-800'
-  };
+  const isMale = type === 'Nam';
+  const isFemale = type === 'Nữ';
 
-  const currentStyle = styles[type] || styles.default;
+  let styles = 'bg-gray-100 text-gray-800';
+  if (isMale) styles = 'bg-[#E3F2FD] text-[#1976D2]';
+  if (isFemale) styles = 'bg-[#FCE4EC] text-[#D81B60]';
 
-  return (
-    <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${currentStyle}`}>
-      {text || type}
-    </span>
-  );
+  return <span className={`px-3 py-1 text-xs font-semibold rounded-md ${styles}`}>{text || type}</span>;
 };
 
 export default Badge;
