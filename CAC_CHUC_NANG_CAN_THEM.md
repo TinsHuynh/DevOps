@@ -2,13 +2,19 @@
 
 Tài liệu này được chuyển sang dạng phase + todo checklist để theo dõi trực tiếp những gì đã hoàn thành trong code hiện tại, những gì mới ở mức demo UI, và những phần còn thiếu cần làm tiếp.
 
+> **Cập nhật lần cuối:** 2026-05-19
+
 ## Trạng thái tổng quan
 
 - [x] Đã có trang đăng nhập và phân quyền theo vai trò.
 - [x] Đã có router riêng cho student, teacher, admin và route bảo vệ.
 - [x] Đã có CRUD sinh viên ở admin.
-- [~] Student, teacher và admin dashboard đã có UI và dữ liệu mẫu/demonstration.
-- [ ] Các API nghiệp vụ sâu hơn như điểm số, lịch học, thông báo, nhật ký hoạt động chưa được nối đầy đủ.
+- [x] Đã có CRUD giáo viên ở admin (TeachersView + backend API đầy đủ).
+- [x] Đã có quản lý thông báo nối backend (NotificationsView).
+- [x] Đã có nhật ký hoạt động nối backend (ActivityLogsView).
+- [~] Student, teacher dashboard đã có UI và dữ liệu mẫu/demonstration.
+- [~] CategoriesView đang dùng dữ liệu mẫu local, chưa có backend.
+- [ ] Các API nghiệp vụ sâu hơn như điểm số, lịch học chưa được nối.
 
 ## Phase 1 - Xác thực và phân quyền
 
@@ -65,15 +71,13 @@ Mục tiêu: quản trị tài khoản, phân quyền và các dữ liệu hệ 
 - [x] Xem dashboard tổng quan với các chỉ số chính.
 - [x] Xem danh sách tài khoản người dùng.
 - [x] Thay đổi vai trò người dùng.
-- [x] Thêm, sửa, xóa dữ liệu sinh viên.
-- [~] Quản lý thông báo hệ thống ở mức giao diện.
-- [~] Theo dõi nhật ký hoạt động ở mức demo.
-- [ ] Thêm, sửa, xóa dữ liệu giáo viên.
-- [ ] Quản lý lớp học, khoa, môn học hoặc danh mục liên quan.
-- [ ] Lưu thông báo hệ thống xuống backend.
-- [ ] Kết nối nhật ký hoạt động với nguồn dữ liệu thật.
+- [x] Thêm, sửa, xóa dữ liệu sinh viên (StudentsView + API).
+- [x] Thêm, sửa, xóa dữ liệu giáo viên (TeachersView + API đầy đủ).
+- [x] Lưu thông báo hệ thống xuống backend (NotificationsView nối API).
+- [x] Kết nối nhật ký hoạt động với nguồn dữ liệu thật (ActivityLogsView nối API).
+- [~] Quản lý danh mục (lớp, khoa, môn học) ở mức giao diện demo — **chưa có backend**.
 
-Ghi chú trạng thái: phần quản trị người dùng và CRUD sinh viên đã hoàn thành, các module quản trị mở rộng vẫn còn thiếu.
+Ghi chú trạng thái: hầu hết admin đã hoàn thành. Còn lại duy nhất là CategoriesView chưa nối backend.
 
 ## Phase 5 - Hoàn thiện backend và kiến trúc
 
@@ -82,17 +86,19 @@ Mục tiêu: chuẩn hóa luồng dữ liệu giữa frontend và backend để 
 - [x] Có API đăng nhập `/api/auth/login`.
 - [x] Có API danh sách, thêm, sửa, xóa người dùng.
 - [x] Có API danh sách, thêm, sửa, xóa sinh viên.
+- [x] Có API danh sách, thêm, sửa, xóa giáo viên.
+- [x] Có API thông báo (list, create, delete).
+- [x] Có API nhật ký hoạt động (list, getRecent, getByModule).
 - [x] Có middleware/route bảo vệ ở mức frontend.
-- [ ] Tách API riêng cho học sinh, giáo viên, admin theo nghiệp vụ.
-- [ ] Bổ sung middleware kiểm tra đăng nhập và quyền ở backend.
+- [ ] Bổ sung middleware kiểm tra đăng nhập và quyền ở **backend** (hiện tại `req.user` chưa được inject).
 - [ ] Chuẩn hóa xử lý lỗi và thông báo giữa frontend và backend.
-- [ ] Đồng bộ dữ liệu thật cho profile, lịch học, điểm số, thông báo và nhật ký.
+- [ ] Đồng bộ dữ liệu thật cho profile, lịch học, điểm số của student/teacher.
 
-## Danh sách todo nên làm tiếp
+## Danh sách todo còn lại (ưu tiên)
 
-- [ ] Nối student dashboard với API thật.
-- [ ] Nối teacher dashboard với API thật.
-- [ ] Thêm màn hình quản lý giáo viên.
-- [ ] Thêm module quản lý lớp, khoa, môn học.
-- [ ] Gắn thông báo hệ thống và nhật ký hoạt động vào backend.
-- [ ] Bổ sung test cho luồng đăng nhập, phân quyền và CRUD chính.
+- [ ] **[Backend]** Thêm middleware xác thực JWT để bảo vệ các route `/api/teachers`, `/api/notifications`, `/api/logs` — hiện tại `req.user` luôn là `undefined`.
+- [ ] **[Admin]** Nối CategoriesView (quản lý lớp, khoa, môn học) với backend API thật.
+- [ ] **[Student]** Nối StudentDashboard với API thật (profile, thông báo published, lịch học).
+- [ ] **[Teacher]** Nối TeacherDashboard với API thật (danh sách lớp, điểm danh, cập nhật điểm).
+- [ ] **[Backend]** Chuẩn hóa xử lý lỗi (error handler middleware tập trung).
+- [ ] **[Test]** Bổ sung test cho luồng đăng nhập, phân quyền và CRUD chính.
