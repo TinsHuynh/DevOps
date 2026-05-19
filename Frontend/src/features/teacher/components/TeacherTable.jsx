@@ -39,6 +39,7 @@ const TeacherTable = ({ teachers, onEdit, onDelete, isLoading }) => {
               <th className="px-8 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Họ và Tên</th>
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Giới tính</th>
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Khoa</th>
+              <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Lớp giảng dạy</th>
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-5 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Trạng thái</th>
               <th className="px-6 py-5 text-right text-[11px] font-bold text-gray-500 uppercase tracking-wider">Thao tác</th>
@@ -62,6 +63,11 @@ const TeacherTable = ({ teachers, onEdit, onDelete, isLoading }) => {
                   <Badge type={teacher.gender} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{teacher.department}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
+                  <span className="inline-block rounded-lg bg-indigo-50 text-indigo-700 px-3 py-1 text-xs font-semibold">
+                    {teacher.assignedClass || 'Chưa phân lớp'}
+                  </span>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{teacher.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${teacher.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

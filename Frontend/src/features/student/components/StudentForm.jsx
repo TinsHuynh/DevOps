@@ -10,6 +10,7 @@ const StudentForm = ({ student, onSubmit, onCancel }) => {
     studentClass: '',
     major: '',
     department: '',
+    createUserAccount: true,
   });
 
   const [categories, setCategories] = useState([]);
@@ -64,8 +65,11 @@ const StudentForm = ({ student, onSubmit, onCancel }) => {
   }, [student]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -219,6 +223,27 @@ const StudentForm = ({ student, onSubmit, onCancel }) => {
           )}
         </select>
       </div>
+
+      {!student && (
+        <div className="mt-4 flex items-start p-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+          <div className="flex items-center h-5">
+            <input
+              id="createUserAccount"
+              name="createUserAccount"
+              type="checkbox"
+              checked={formData.createUserAccount}
+              onChange={handleChange}
+              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded cursor-pointer"
+            />
+          </div>
+          <div className="ml-3 text-sm">
+            <label htmlFor="createUserAccount" className="font-semibold text-indigo-950 cursor-pointer">
+              Tạo tài khoản đăng nhập đi kèm cho sinh viên
+            </label>
+            <p className="text-indigo-700/80 text-xs">Username đăng nhập là MSSV và mật khẩu mặc định là <span className="font-bold">123456</span>.</p>
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-end space-x-3 pt-4 border-t mt-6">
         <button

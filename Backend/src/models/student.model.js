@@ -32,6 +32,14 @@ const studentSchema = new Schema(
       type: String,
       required: false, // Make optional just in case, but we will collect it in form
     },
+    gpa: {
+      type: Number,
+      default: 8.5,
+    },
+    attendanceRate: {
+      type: Number,
+      default: 95,
+    },
   },
   { timestamps: true }
 );

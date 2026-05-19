@@ -70,6 +70,47 @@ const createUser = async (payload) => {
     ...passwordFields,
   });
 
+  // Tự động đồng bộ tạo hồ sơ sinh viên hoặc giáo viên tương ứng
+  try {
+    if (normalized.role === 'student') {
+      const Student = require('../models/student.model');
+      const existingStudent = await Student.findOne({ studentId: normalized.username });
+      if (!existingStudent) {
+        await Student.create({
+          studentId: normalized.username, // Username đồng thời là MSSV
+          name: normalized.fullName,
+          dob: new Date('2004-01-01'),
+          gender: 'Nam',
+          studentClass: 'Chưa phân lớp',
+          major: 'Công nghệ thông tin',
+          department: 'Khoa Công nghệ thông tin'
+        });
+      }
+    } else if (normalized.role === 'teacher') {
+      const Teacher = require('../models/teacher.model');
+      const emailAddress = normalized.username.includes('@') ? normalized.username : `${normalized.username}@school.edu.vn`;
+      const existingTeacher = await Teacher.findOne({ email: emailAddress });
+      if (!existingTeacher) {
+        const count = await Teacher.countDocuments();
+        const teacherId = 'GV' + String(count + 1).padStart(5, '0');
+        await Teacher.create({
+          teacherId: teacherId,
+          name: normalized.fullName,
+          dob: new Date('1985-01-01'),
+          gender: 'Nam',
+          department: 'Khoa Công nghệ thông tin',
+          email: emailAddress,
+          phone: '0909123456',
+          specialization: 'Lập trình',
+          assignedClass: 'Chưa phân lớp',
+          status: 'active'
+        });
+      }
+    }
+  } catch (syncError) {
+    console.error('Lỗi khi tự động đồng bộ tạo hồ sơ sinh viên/giáo viên:', syncError);
+  }
+
   return toPublicUser(user);
 };
 
@@ -100,6 +141,21 @@ const deleteUser = async (id) => {
   if (!user) {
     throw new Error('User not found');
   }
+
+  // Tự động xóa hồ sơ sinh viên hoặc giáo viên tương ứng để tránh rác DB
+  try {
+    if (user.role === 'student') {
+      const Student = require('../models/student.model');
+      await Student.findOneAndDelete({ studentId: user.username });
+    } else if (user.role === 'teacher') {
+      const Teacher = require('../models/teacher.model');
+      const emailAddress = user.username.includes('@') ? user.username : `${user.username}@school.edu.vn`;
+      await Teacher.findOneAndDelete({ email: emailAddress });
+    }
+  } catch (syncError) {
+    console.error('Lỗi khi tự động xóa hồ sơ sinh viên/giáo viên:', syncError);
+  }
+
   return toPublicUser(user);
 };
 

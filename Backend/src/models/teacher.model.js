@@ -36,6 +36,10 @@ const teacherSchema = new Schema(
 		specialization: {
 			type: String,
 		},
+		assignedClass: {
+			type: String,
+			default: '',
+		},
 		status: {
 			type: String,
 			enum: ['active', 'inactive'],
