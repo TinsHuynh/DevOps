@@ -2,7 +2,13 @@ const crypto = require('crypto');
 const User = require('../models/user.model');
 
 const DERIVE_KEY_LENGTH = 64;
-const DEFAULT_ITERATIONS = 150000;
+
+const defaultUsers = [
+  { username: 'student01', fullName: 'Nguyễn Văn An', role: 'student', password: '123456', status: 'active' },
+  { username: 'teacher01', fullName: 'Trần Thị Mai', role: 'teacher', password: '123456', status: 'active' },
+  { username: 'admin', fullName: 'Quản trị viên hệ thống', role: 'admin', password: 'admin123', status: 'active' },
+  { username: 'locked_student', fullName: 'Học sinh bị khóa', role: 'student', password: '123456', status: 'locked' },
+];
 
 const toPublicUser = (user) => ({
   _id: user._id,
@@ -69,6 +75,7 @@ const createUser = async (payload) => {
 
 const updateUser = async (id, payload) => {
   const normalized = normalizeUserPayload(payload);
+
   const update = {
     ...(normalized.username ? { username: normalized.username } : {}),
     ...(normalized.fullName ? { fullName: normalized.fullName } : {}),
@@ -106,10 +113,14 @@ const getUserById = async (id) => {
   if (!user) {
     throw new Error('User not found');
   }
+
   return toPublicUser(user);
 };
 
-const getUserByUsername = async (username) => User.findOne({ username: String(username || '').trim().toLowerCase() });
+const getUserByUsername = async (username) => {
+  const normalizedUsername = String(username || '').trim().toLowerCase();
+  return User.findOne({ username: normalizedUsername });
+};
 
 const authenticateUser = async (username, password) => {
   const user = await getUserByUsername(username);
@@ -136,14 +147,7 @@ const authenticateUser = async (username, password) => {
 };
 
 const seedDefaultUsers = async () => {
-  const defaults = [
-    { username: 'student01', fullName: 'Nguyễn Văn An', role: 'student', password: '123456', status: 'active' },
-    { username: 'teacher01', fullName: 'Trần Thị Mai', role: 'teacher', password: '123456', status: 'active' },
-    { username: 'admin', fullName: 'Quản trị viên hệ thống', role: 'admin', password: 'admin123', status: 'active' },
-    { username: 'locked_student', fullName: 'Học sinh bị khóa', role: 'student', password: '123456', status: 'locked' },
-  ];
-
-  for (const item of defaults) {
+  for (const item of defaultUsers) {
     const username = item.username.toLowerCase();
     const existing = await User.findOne({ username });
     const passwordFields = buildPasswordFields(item.password);
