@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import StudentLayout from '../../Components/layout/StudentLayout';
 import studentService from '../../features/student/services/studentService';
 import notificationService from '../../services/notificationService';
+import categoryService from '../../services/categoryService';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   StudentOverviewView,
@@ -17,6 +18,7 @@ const StudentDashboard = () => {
   const { currentUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
+  const [schedule, setSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
@@ -40,16 +42,34 @@ const StudentDashboard = () => {
           department: 'Khoa Công nghệ thông tin',
           gpa: 8.5,
           attendanceRate: 95,
-          status: 'Hoạt động',
         });
       }
 
       // Nạp thông báo
-      const notices = await notificationService.fetchNotifications();
-      // Lọc các thông báo liên quan đến lớp của sinh viên hoặc thông báo toàn trường
-      setAnnouncements(notices);
+      const notifications = await notificationService.fetchNotifications();
+      setAnnouncements(notifications);
+
+      // Nạp lịch học động từ danh mục
+      try {
+        const categories = await categoryService.fetchCategories();
+        const className = found ? found.studentClass : 'CNTT01';
+        const schedCat = categories.find(c => c.type === 'Thời khóa biểu' && c.name === className);
+        if (schedCat && schedCat.description) {
+          try {
+            setSchedule(JSON.parse(schedCat.description));
+          } catch (jsonErr) {
+            console.error('JSON lịch học không hợp lệ:', jsonErr);
+            setSchedule([]);
+          }
+        } else {
+          setSchedule([]);
+        }
+      } catch (err) {
+        console.error('Lỗi khi nạp lịch học động:', err);
+      }
+
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu sinh viên từ API:', error);
+      console.error('Lỗi khi tải thông tin sinh viên từ API:', error);
     } finally {
       setLoading(false);
     }
@@ -93,7 +113,7 @@ const StudentDashboard = () => {
       case 'courses':
         return <StudentCoursesView profile={profile} />;
       case 'schedule':
-        return <StudentScheduleView profile={profile} />;
+        return <StudentScheduleView profile={profile} schedule={schedule} />;
       case 'announcements':
         return <StudentAnnouncementsView announcements={announcements} />;
       case 'password':

@@ -40,6 +40,18 @@ const studentSchema = new Schema(
       type: Number,
       default: 95,
     },
+    midtermScore: {
+      type: Number,
+      default: 8.5,
+    },
+    finalScore: {
+      type: Number,
+      default: 8.5,
+    },
+    attendanceScore: {
+      type: Number,
+      default: 9.5,
+    },
   },
   { timestamps: true }
 );

@@ -117,7 +117,8 @@ const CategoriesView = () => {
                           <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                             cat.type === 'Khoa' ? 'bg-amber-50 text-amber-700' :
                             cat.type === 'Ngành học' ? 'bg-purple-50 text-purple-700' :
-                            cat.type === 'Lớp học' ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'
+                            cat.type === 'Lớp học' ? 'bg-blue-50 text-blue-700' :
+                            cat.type === 'Thời khóa biểu' ? 'bg-pink-50 text-pink-700' : 'bg-emerald-50 text-emerald-700'
                           }`}>
                             {cat.type}
                           </span>
@@ -176,15 +177,19 @@ const CategoriesView = () => {
               <option value="Ngành học">Ngành học</option>
               <option value="Lớp học">Lớp học</option>
               <option value="Môn học">Môn học</option>
+              <option value="Thời khóa biểu">Thời khóa biểu lớp học</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Mô Tả</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              {formData.type === 'Thời khóa biểu' ? 'Cấu hình Thời khóa biểu (Định dạng JSON)' : 'Mô Tả'}
+            </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:border-indigo-500"
-              rows="3"
+              placeholder={formData.type === 'Thời khóa biểu' ? 'Ví dụ: [{"day": "Thứ 2", "time": "07:30 - 10:00", "subject": "Lập trình Web", "room": "A201"}, {"day": "Thứ 4", "time": "13:00 - 15:30", "subject": "Cơ sở dữ liệu", "room": "B105"}]' : 'Nhập mô tả chi tiết...'}
+              className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-xs"
+              rows="4"
             />
           </div>
           <div>

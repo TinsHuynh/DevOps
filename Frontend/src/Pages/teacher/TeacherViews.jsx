@@ -4,6 +4,7 @@ import StatsCard from '../../Components/common/StatsCard';
 import Badge from '../../Components/common/Badge';
 import { useToast } from '../../Components/common/ToastNotification';
 import studentService from '../../features/student/services/studentService';
+import userService from '../../services/userService';
 import notificationService from '../../services/notificationService';
 import { teacherClasses, teacherStudents, teacherTasks } from '../../data/portalData';
 
@@ -191,7 +192,7 @@ export const TeacherStudentsView = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
-  const [newGpa, setNewGpa] = useState('');
+  const [componentScores, setComponentScores] = useState({ midterm: 8.5, finalScore: 8.5, attendance: 9.5 });
   const [isGradeModalOpen, setIsGradeModalOpen] = useState(false);
   const toast = useToast();
 
@@ -215,25 +216,42 @@ export const TeacherStudentsView = () => {
 
   const handleEditGrade = (student) => {
     setEditingStudent(student);
-    setNewGpa(student.score.toString());
+    const orig = student.original || {};
+    setComponentScores({
+      midterm: orig.midtermScore !== undefined ? orig.midtermScore : student.score,
+      finalScore: orig.finalScore !== undefined ? orig.finalScore : student.score,
+      attendance: orig.attendanceScore !== undefined ? orig.attendanceScore : (orig.attendanceRate ? orig.attendanceRate / 10 : 9.5)
+    });
     setIsGradeModalOpen(true);
   };
 
   const handleSaveGrade = async (e) => {
     e.preventDefault();
-    if (!newGpa || isNaN(newGpa) || Number(newGpa) < 0 || Number(newGpa) > 10) {
-      toast('Vui lòng nhập điểm GPA hợp lệ từ 0.0 đến 10.0.', 'error');
+    const { midterm, finalScore, attendance } = componentScores;
+    if (
+      midterm < 0 || midterm > 10 ||
+      finalScore < 0 || finalScore > 10 ||
+      attendance < 0 || attendance > 10
+    ) {
+      toast('Điểm số phải nằm trong khoảng từ 0 đến 10.', 'error');
       return;
     }
+
+    const calculatedGpa = Number((midterm * 0.3 + finalScore * 0.6 + attendance * 0.1).toFixed(2));
+    const calculatedAttendanceRate = Math.round(attendance * 10);
 
     try {
       const orig = editingStudent.original;
       if (orig) {
         await studentService.updateStudent(orig._id, {
           ...orig,
-          gpa: Number(newGpa)
+          midtermScore: Number(midterm),
+          finalScore: Number(finalScore),
+          attendanceScore: Number(attendance),
+          gpa: calculatedGpa,
+          attendanceRate: calculatedAttendanceRate
         });
-        toast(`Đã cập nhật điểm cho học sinh ${editingStudent.name} thành công!`);
+        toast(`Đã nhập sổ điểm chi tiết cho học sinh ${editingStudent.name} thành công!`);
         setIsGradeModalOpen(false);
         load();
       }
@@ -301,33 +319,63 @@ export const TeacherStudentsView = () => {
         )}
       </section>
 
-      <Modal isOpen={isGradeModalOpen} onClose={() => setIsGradeModalOpen(false)} title="Nhập điểm cho học sinh">
+      <Modal isOpen={isGradeModalOpen} onClose={() => setIsGradeModalOpen(false)} title="Nhập sổ điểm chi tiết">
         {editingStudent && (
           <form onSubmit={handleSaveGrade} className="space-y-4">
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Họ và tên</p>
-              <p className="text-base font-bold text-slate-900 mt-1">{editingStudent.name}</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Họ và tên học sinh</p>
+              <p className="text-base font-bold text-slate-900 mt-1">{editingStudent.name} ({editingStudent.id})</p>
             </div>
-            <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Mã số sinh viên (MSSV)</p>
-              <p className="text-mono text-sm text-slate-600 mt-1">{editingStudent.id}</p>
+            
+            <div className="grid grid-cols-3 gap-3">
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-700">Chuyên cần (10%)</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  value={componentScores.attendance}
+                  onChange={(e) => setComponentScores(p => ({ ...p, attendance: Number(e.target.value) }))}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-700">Giữa kỳ (30%)</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  value={componentScores.midterm}
+                  onChange={(e) => setComponentScores(p => ({ ...p, midterm: Number(e.target.value) }))}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold text-slate-700">Cuối kỳ (60%)</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  value={componentScores.finalScore}
+                  onChange={(e) => setComponentScores(p => ({ ...p, finalScore: Number(e.target.value) }))}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+                />
+              </label>
             </div>
-            <label className="block">
-              <span className="mb-1 block text-sm font-semibold text-slate-700">Điểm số GPA mới (0.0 - 10.0)</span>
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                max="10"
-                value={newGpa}
-                onChange={(e) => setNewGpa(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
-                placeholder="Ví dụ: 8.5"
-              />
-            </label>
+
+            <div className="rounded-xl bg-slate-50 p-4 border border-slate-100 text-center">
+              <span className="text-xs text-slate-500 font-semibold uppercase tracking-widest block">Điểm trung bình (GPA) dự kiến</span>
+              <span className="text-2xl font-black text-[#2E7D32] mt-1 block">
+                {(componentScores.midterm * 0.3 + componentScores.finalScore * 0.6 + componentScores.attendance * 0.1).toFixed(2)}
+              </span>
+            </div>
+
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setIsGradeModalOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700">Hủy</button>
-              <button type="submit" className="rounded-xl bg-[#2E7D32] px-4 py-2.5 text-sm font-semibold text-white">Lưu điểm</button>
+              <button type="button" onClick={() => setIsGradeModalOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">Hủy</button>
+              <button type="submit" className="rounded-xl bg-[#2E7D32] px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-700 transition">Lưu điểm</button>
             </div>
           </form>
         )}
@@ -626,6 +674,171 @@ export const TeacherTasksView = () => {
           </div>
         ))}
       </section>
+    </div>
+  );
+};
+
+// ─── Profile & Security ───────────────────────────────────────────────────────
+export const TeacherProfileView = ({ profile, onUpdate }) => {
+  const toast = useToast();
+  const [draft, setDraft] = useState({ phone: '', email: '', specialization: '' });
+  const [isOpen, setIsOpen] = useState(false);
+  const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+  const openModal = () => {
+    setDraft({
+      phone: profile?.phone || '',
+      email: profile?.email || '',
+      specialization: profile?.specialization || '',
+    });
+    setIsOpen(true);
+  };
+
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      await onUpdate(draft);
+      setIsOpen(false);
+      toast('Đã cập nhật thông tin liên hệ và chuyên môn.');
+    } catch (err) {
+      toast('Cập nhật hồ sơ thất bại.', 'error');
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (form.newPassword.length < 6) {
+      toast('Mật khẩu mới phải có ít nhất 6 ký tự.', 'error');
+      return;
+    }
+    if (form.newPassword !== form.confirmPassword) {
+      toast('Xác nhận mật khẩu không khớp.', 'error');
+      return;
+    }
+    try {
+      const usersList = await userService.fetchUsers();
+      const userObj = usersList.find(u => u.username === profile.teacherId || u.username === profile.email.split('@')[0]);
+      if (userObj) {
+        await userService.updateUser(userObj._id, { password: form.newPassword });
+        setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        toast('Đã đổi mật khẩu thành công.');
+      } else {
+        toast('Không tìm thấy tài khoản người dùng đăng nhập.', 'error');
+      }
+    } catch (err) {
+      toast('Đổi mật khẩu thất bại. Vui lòng kiểm tra lại.', 'error');
+    }
+  };
+
+  const fields = [
+    ['Mã giáo viên', profile?.teacherId],
+    ['Họ tên', profile?.name],
+    ['Khoa quản lý', profile?.department],
+    ['Lớp chủ nhiệm', profile?.assignedClass || 'Chưa phân lớp'],
+    ['Chuyên môn giảng dạy', profile?.specialization || 'Chưa cập nhật'],
+    ['Email liên hệ', profile?.email || 'Chưa cập nhật'],
+    ['Số điện thoại', profile?.phone || 'Chưa cập nhật'],
+  ];
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 space-y-6">
+      <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-widest text-[#2E7D32]">Hồ Sơ</p>
+          <h1 className="mt-1 text-3xl font-black text-slate-900">Thông Tin Giảng Viên</h1>
+        </div>
+        <button
+          onClick={openModal}
+          className="rounded-xl bg-[#2E7D32] px-4 py-3 text-sm font-semibold text-white hover:bg-green-700 transition shadow-sm"
+        >
+          <i className="fas fa-pen mr-2" />Cập nhật thông tin liên hệ
+        </button>
+      </header>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Chi tiết hồ sơ */}
+        <section className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-900">Chi tiết hồ sơ giảng dạy</h2>
+            <Badge type="Nam" text="Giáo viên" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {fields.map(([label, value]) => (
+              <div key={label} className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">{label}</p>
+                <p className="mt-2 text-sm font-bold text-slate-800">{value}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Bảo mật đổi mật khẩu */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Đổi mật khẩu</h2>
+            <p className="text-xs text-slate-500 mb-4">Hãy thay đổi mật khẩu định kỳ để bảo vệ tài khoản cá nhân của bạn.</p>
+            <form onSubmit={handlePasswordSubmit} className="space-y-3">
+              {[
+                ['currentPassword', 'Mật khẩu hiện tại'],
+                ['newPassword', 'Mật khẩu mới'],
+                ['confirmPassword', 'Xác nhận mật khẩu mới'],
+              ].map(([name, label]) => (
+                <label key={name} className="block">
+                  <span className="mb-1 block text-xs font-medium text-slate-700">{label}</span>
+                  <input
+                    type="password"
+                    value={form[name]}
+                    onChange={(e) => setForm((p) => ({ ...p, [name]: e.target.value }))}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+                  />
+                </label>
+              ))}
+              <button type="submit" className="w-full rounded-xl bg-[#2E7D32] px-4 py-2.5 text-xs font-semibold text-white hover:bg-green-700 transition">
+                Cập nhật mật khẩu
+              </button>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Cập nhật thông tin liên hệ & chuyên môn">
+        <form onSubmit={saveProfile} className="space-y-4">
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-700">Email liên hệ</span>
+            <input
+              type="email"
+              value={draft.email}
+              onChange={(e) => setDraft((p) => ({ ...p, email: e.target.value }))}
+              placeholder="Nhập email mới..."
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-700">Số điện thoại</span>
+            <input
+              type="text"
+              value={draft.phone}
+              onChange={(e) => setDraft((p) => ({ ...p, phone: e.target.value }))}
+              placeholder="Nhập số điện thoại mới..."
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-700">Chuyên môn giảng dạy</span>
+            <input
+              type="text"
+              value={draft.specialization}
+              onChange={(e) => setDraft((p) => ({ ...p, specialization: e.target.value }))}
+              placeholder="Ví dụ: Kỹ thuật phần mềm, Cơ sở dữ liệu..."
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2E7D32] focus:ring-4 focus:ring-green-100"
+            />
+          </label>
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={() => setIsOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">Hủy</button>
+            <button type="submit" className="rounded-xl bg-[#2E7D32] px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-700 transition">Lưu thay đổi</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

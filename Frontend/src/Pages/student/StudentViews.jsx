@@ -184,13 +184,13 @@ export const StudentProfileView = ({ profile, onUpdate }) => {
 
 // ─── Courses & Grades ─────────────────────────────────────────────────────────
 export const StudentCoursesView = ({ profile }) => (
-  <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
+  <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 space-y-6">
     <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <p className="text-sm font-semibold uppercase tracking-widest text-[#0E7490]">Học Tập</p>
       <h1 className="mt-1 text-3xl font-black text-slate-900">Môn Học & Điểm Số</h1>
     </header>
 
-    <div className="mt-6 grid gap-6 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex items-center justify-between">
         <div>
           <p className="text-sm text-slate-500">Điểm trung bình học tập (GPA)</p>
@@ -211,7 +211,30 @@ export const StudentCoursesView = ({ profile }) => (
       </div>
     </div>
 
-    <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm overflow-x-auto">
+    {/* Bảng Điểm Thành Phần Chi Tiết */}
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-bold text-slate-900 mb-4">Sổ Điểm Thành Phần Chi Tiết (Từ Giáo Viên)</h2>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Điểm Chuyên cần (10%)</p>
+          <p className="mt-2 text-2xl font-black text-[#0E7490]">{profile?.attendanceScore !== undefined ? profile.attendanceScore.toFixed(1) : '9.5'}</p>
+          <p className="text-xs text-slate-400 mt-1">Hệ số 0.1</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Điểm Giữa kỳ (30%)</p>
+          <p className="mt-2 text-2xl font-black text-indigo-600">{profile?.midtermScore !== undefined ? profile.midtermScore.toFixed(1) : '8.5'}</p>
+          <p className="text-xs text-slate-400 mt-1">Hệ số 0.3</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100 text-center">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Điểm Cuối kỳ (60%)</p>
+          <p className="mt-2 text-2xl font-black text-emerald-600">{profile?.finalScore !== undefined ? profile.finalScore.toFixed(1) : '8.5'}</p>
+          <p className="text-xs text-slate-400 mt-1">Hệ số 0.6</p>
+        </div>
+      </div>
+    </section>
+
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm overflow-x-auto">
+      <h2 className="text-xl font-bold text-slate-900 mb-4">Điểm Quy Đổi Môn Học</h2>
       <table className="w-full text-left text-sm">
         <thead className="bg-slate-50 text-slate-500">
           <tr>
@@ -247,36 +270,41 @@ export const StudentCoursesView = ({ profile }) => (
 );
 
 // ─── Schedule ─────────────────────────────────────────────────────────────────
-export const StudentScheduleView = ({ profile }) => (
-  <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
-    <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-semibold uppercase tracking-widest text-[#0E7490]">Thời Khóa Biểu</p>
-      <h1 className="mt-1 text-3xl font-black text-slate-900">Lịch Học Lớp {profile?.studentClass || 'Chưa phân lớp'}</h1>
-    </header>
-    <section className="mt-6 space-y-4">
-      {studentSchedule.map((item) => (
-        <div
-          key={`${item.day}-${item.subject}`}
-          className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:border-slate-300 transition"
-        >
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-cyan-50 flex items-center justify-center">
-              <i className="fas fa-calendar-day text-[#0E7490] text-xl" />
+export const StudentScheduleView = ({ profile, schedule }) => {
+  const displaySchedule = schedule && schedule.length > 0 ? schedule : studentSchedule;
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
+      <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p className="text-sm font-semibold uppercase tracking-widest text-[#0E7490]">Thời Khóa Biểu</p>
+        <h1 className="mt-1 text-3xl font-black text-slate-900">Lịch Học Lớp {profile?.studentClass || 'Chưa phân lớp'}</h1>
+        <p className="mt-2 text-sm text-slate-500">Xem lịch học trực tiếp phân phối động từ Ban Giám Hiệu (Admin).</p>
+      </header>
+      <section className="mt-6 space-y-4">
+        {displaySchedule.map((item) => (
+          <div
+            key={`${item.day}-${item.subject}`}
+            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:border-slate-300 transition"
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-cyan-50 flex items-center justify-center">
+                <i className="fas fa-calendar-day text-[#0E7490] text-xl" />
+              </div>
+              <div>
+                <p className="font-bold text-slate-900">{item.day}</p>
+                <p className="text-sm text-slate-500">{item.time}</p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-slate-900">{item.day}</p>
-              <p className="text-sm text-slate-500">{item.time}</p>
+            <div className="text-right sm:text-right">
+              <p className="font-semibold text-slate-900">{item.subject}</p>
+              <p className="text-sm text-slate-500">Phòng {item.room}</p>
             </div>
           </div>
-          <div className="text-right sm:text-right">
-            <p className="font-semibold text-slate-900">{item.subject}</p>
-            <p className="text-sm text-slate-500">Phòng {item.room}</p>
-          </div>
-        </div>
-      ))}
-    </section>
-  </div>
-);
+        ))}
+      </section>
+    </div>
+  );
+};
 
 // ─── Announcements ────────────────────────────────────────────────────────────
 export const StudentAnnouncementsView = ({ announcements }) => (

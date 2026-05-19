@@ -11,7 +11,7 @@ const categorySchema = new Schema(
     },
     type: {
       type: String,
-      enum: ['Khoa', 'Môn học', 'Lớp học', 'Ngành học'],
+      enum: ['Khoa', 'Môn học', 'Lớp học', 'Ngành học', 'Thời khóa biểu'],
       required: true,
     },
     description: {

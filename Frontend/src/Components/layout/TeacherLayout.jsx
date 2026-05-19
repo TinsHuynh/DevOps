@@ -43,6 +43,11 @@ const TeacherLayout = ({ children, currentView, onViewChange }) => {
       label: 'Nhiệm Vụ',
       icon: 'fas fa-tasks',
     },
+    {
+      id: 'profile',
+      label: 'Hồ Sơ & Bảo Mật',
+      icon: 'fas fa-id-card',
+    },
   ];
 
   const initials = currentUser?.fullName
