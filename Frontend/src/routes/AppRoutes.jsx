@@ -47,9 +47,7 @@ const AppRoutes = () => {
         <Route
           path="/admin/students"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <StudentManagementPage />
-            </ProtectedRoute>
+            <Navigate to="/admin" replace />
           }
         />
         <Route path="*" element={<HomeRedirect />} />
