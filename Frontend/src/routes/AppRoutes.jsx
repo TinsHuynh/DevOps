@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import LoginPage from '../pages/login/LoginPage';
-import StudentManagementPage from '../features/student/pages/StudentManagementPage';
-import TeacherDashboard from '../pages/teacher/TeacherDashboard';
-import AdminDashboard from '../pages/admin/AdminDashboard';
-import StudentDashboard from '../pages/student/StudentDashboard';
+import LoginPage from '../Pages/login/LoginPage';
+import StudentManagementPage from '../features/student/Pages/StudentManagementPage';
+import TeacherDashboard from '../Pages/teacher/TeacherDashboard';
+import AdminDashboard from '../Pages/admin/AdminDashboard';
+import StudentDashboard from '../Pages/student/StudentDashboard';
 import ProtectedRoute from './ProtectedRoute';
 import { getRoleHome, useAuth } from '../contexts/AuthContext';
 
