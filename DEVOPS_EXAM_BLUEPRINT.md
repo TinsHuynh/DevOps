@@ -46,8 +46,8 @@ Dưới đây là cẩm nang hướng dẫn chi tiết từng bước cho nhóm 
     *   Đã viết sẵn các bộ test mẫu dùng Mock tại [student.service.test.js](file:///d:/HOCTAP/Học%20Kỳ%206/Devops/QuanLySinhVien/Backend/tests/unit/services/student.service.test.js) và [user.service.test.js](file:///d:/HOCTAP/Học%20Kỳ%206/Devops/QuanLySinhVien/Backend/tests/unit/services/user.service.test.js).
     *   *Cách chạy:* Mở terminal tại `Backend/` chạy lệnh `npm test` để demo cho giảng viên.
 2.  **Static Code Analysis (Phân tích code tĩnh):**
-    *   *Giải pháp đơn giản:* Cài đặt thư viện **ESLint** để phân tích lỗi cú pháp và chất lượng mã nguồn tự động trước khi build.
-    *   *Cách cài đặt:* Chạy `npm install --save-dev eslint` trong thư mục `Backend/` và thiết lập file cấu hình `.eslintrc.json`.
+  *   *Giải pháp mạnh hơn:* Dùng **SonarQube** hoặc **SonarCloud** để phân tích bug, code smell, security hotspot và mức độ trùng lặp mã nguồn.
+  *   *Cách cài đặt:* Triển khai SonarQube Server hoặc kết nối SonarCloud, tạo file cấu hình `sonar-project.properties`, và thêm bước `sonar-scanner` vào pipeline CI/CD trước khi build/deploy.
 
 ---
 

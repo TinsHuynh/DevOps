@@ -128,6 +128,18 @@ describe('controller integration routes', () => {
         });
     });
 
+    test('GET /:id returns a user', async () => {
+      userService.getUserById.mockResolvedValue({ username: 'sv001', role: 'student' });
+      const app = buildApp(userRoutes);
+
+      await request(app)
+        .get('/user-1')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ username: 'sv001', role: 'student' });
+        });
+    });
+
     test('POST / creates user', async () => {
       userService.createUser.mockResolvedValue({ username: 'sv002', role: 'student' });
       const app = buildApp(userRoutes);
@@ -140,9 +152,46 @@ describe('controller integration routes', () => {
           expect(body).toEqual({ username: 'sv002', role: 'student' });
         });
     });
+
+    test('PUT /:id updates a user', async () => {
+      userService.updateUser.mockResolvedValue({ username: 'sv002', fullName: 'Tran Thi B' });
+      const app = buildApp(userRoutes);
+
+      await request(app)
+        .put('/user-2')
+        .send({ fullName: 'Tran Thi B' })
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ username: 'sv002', fullName: 'Tran Thi B' });
+        });
+    });
+
+    test('DELETE /:id removes a user', async () => {
+      userService.deleteUser.mockResolvedValue({ username: 'sv003' });
+      const app = buildApp(userRoutes);
+
+      await request(app)
+        .delete('/user-3')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ message: 'User deleted.' });
+        });
+    });
   });
 
   describe('student routes', () => {
+    test('GET / returns students list', async () => {
+      studentService.listStudents.mockResolvedValue([{ studentId: 'sv001' }]);
+      const app = buildApp(studentRoutes);
+
+      await request(app)
+        .get('/')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual([{ studentId: 'sv001' }]);
+        });
+    });
+
     test('POST / creates student and returns 201', async () => {
       studentService.createStudent.mockResolvedValue({ studentId: 'sv001', name: 'Nguyen Van A' });
       const app = buildApp(studentRoutes);
@@ -167,9 +216,58 @@ describe('controller integration routes', () => {
           expect(body).toEqual({ studentId: 'sv001' });
         });
     });
+
+    test('PUT /:id updates a student', async () => {
+      studentService.updateStudent.mockResolvedValue({ studentId: 'sv001', name: 'Updated' });
+      const app = buildApp(studentRoutes);
+
+      await request(app)
+        .put('/abc123')
+        .send({ name: 'Updated' })
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ studentId: 'sv001', name: 'Updated' });
+        });
+    });
+
+    test('DELETE /:id removes a student', async () => {
+      studentService.deleteStudent.mockResolvedValue({ studentId: 'sv001' });
+      const app = buildApp(studentRoutes);
+
+      await request(app)
+        .delete('/abc123')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ message: 'Student deleted.' });
+        });
+    });
   });
 
   describe('teacher routes', () => {
+    test('GET / returns teachers list', async () => {
+      teacherService.listTeachers.mockResolvedValue([{ teacherId: 'GV00001' }]);
+      const app = buildApp(teacherRoutes);
+
+      await request(app)
+        .get('/')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual([{ teacherId: 'GV00001' }]);
+        });
+    });
+
+    test('GET /:id returns a teacher', async () => {
+      teacherService.getTeacherById.mockResolvedValue({ teacherId: 'GV00001', name: 'Le Van C' });
+      const app = buildApp(teacherRoutes);
+
+      await request(app)
+        .get('/teacher-1')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ teacherId: 'GV00001', name: 'Le Van C' });
+        });
+    });
+
     test('POST / creates teacher and writes activity log', async () => {
       teacherService.createTeacher.mockResolvedValue({ _id: 'teacher-1', name: 'Le Van C' });
       activityLogService.createActivityLog.mockResolvedValue({});
@@ -187,9 +285,57 @@ describe('controller integration routes', () => {
         expect.objectContaining({ action: 'CREATE', module: 'teacher', userId: 'user-1', targetId: 'teacher-1' }),
       );
     });
+
+    test('PUT /:id updates teacher and writes activity log', async () => {
+      teacherService.updateTeacher.mockResolvedValue({ _id: 'teacher-2', name: 'Updated Teacher' });
+      activityLogService.createActivityLog.mockResolvedValue({});
+      const app = buildApp(teacherRoutes, { withUser: true });
+
+      await request(app)
+        .put('/teacher-2')
+        .send({ name: 'Updated Teacher' })
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ _id: 'teacher-2', name: 'Updated Teacher' });
+        });
+
+      expect(activityLogService.createActivityLog).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'UPDATE', module: 'teacher', userId: 'user-1', targetId: 'teacher-2' }),
+      );
+    });
+
+    test('DELETE /:id removes teacher and writes activity log', async () => {
+      teacherService.getTeacherById.mockResolvedValue({ _id: 'teacher-3', name: 'To Delete' });
+      teacherService.deleteTeacher.mockResolvedValue({ _id: 'teacher-3', name: 'To Delete' });
+      activityLogService.createActivityLog.mockResolvedValue({});
+      const app = buildApp(teacherRoutes, { withUser: true });
+
+      await request(app)
+        .delete('/teacher-3')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ message: 'Teacher deleted.' });
+        });
+
+      expect(activityLogService.createActivityLog).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'DELETE', module: 'teacher', userId: 'user-1', targetId: 'teacher-3' }),
+      );
+    });
   });
 
   describe('notification routes', () => {
+    test('GET / returns notification list', async () => {
+      notificationService.listNotifications.mockResolvedValue([{ title: 'Notice' }]);
+      const app = buildApp(notificationRoutes);
+
+      await request(app)
+        .get('/')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual([{ title: 'Notice' }]);
+        });
+    });
+
     test('GET /published returns published notifications', async () => {
       notificationService.getPublishedNotifications.mockResolvedValue([{ title: 'Notice' }]);
       const app = buildApp(notificationRoutes);
@@ -199,6 +345,18 @@ describe('controller integration routes', () => {
         .expect(200)
         .expect(({ body }) => {
           expect(body).toEqual([{ title: 'Notice' }]);
+        });
+    });
+
+    test('GET /:id returns a notification', async () => {
+      notificationService.getNotificationById.mockResolvedValue({ _id: 'notice-1', title: 'Notice' });
+      const app = buildApp(notificationRoutes);
+
+      await request(app)
+        .get('/notice-1')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ _id: 'notice-1', title: 'Notice' });
         });
     });
 
@@ -219,9 +377,57 @@ describe('controller integration routes', () => {
         expect.objectContaining({ title: 'Notice', content: 'Hello', createdBy: 'user-1' }),
       );
     });
+
+    test('PUT /:id updates notification and writes activity log', async () => {
+      notificationService.updateNotification.mockResolvedValue({ _id: 'notice-2', title: 'Updated' });
+      activityLogService.createActivityLog.mockResolvedValue({});
+      const app = buildApp(notificationRoutes, { withUser: true });
+
+      await request(app)
+        .put('/notice-2')
+        .send({ title: 'Updated' })
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ _id: 'notice-2', title: 'Updated' });
+        });
+
+      expect(activityLogService.createActivityLog).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'UPDATE', module: 'notification', userId: 'user-1', targetId: 'notice-2' }),
+      );
+    });
+
+    test('DELETE /:id removes notification and writes activity log', async () => {
+      notificationService.getNotificationById.mockResolvedValue({ _id: 'notice-3', title: 'Delete me' });
+      notificationService.deleteNotification.mockResolvedValue({ _id: 'notice-3', title: 'Delete me' });
+      activityLogService.createActivityLog.mockResolvedValue({});
+      const app = buildApp(notificationRoutes, { withUser: true });
+
+      await request(app)
+        .delete('/notice-3')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ message: 'Notification deleted.' });
+        });
+
+      expect(activityLogService.createActivityLog).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'DELETE', module: 'notification', userId: 'user-1', targetId: 'notice-3' }),
+      );
+    });
   });
 
   describe('activity log routes', () => {
+    test('GET / returns activity logs', async () => {
+      activityLogService.listActivityLogs.mockResolvedValue([{ action: 'CREATE' }]);
+      const app = buildApp(activityLogRoutes);
+
+      await request(app)
+        .get('/')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual([{ action: 'CREATE' }]);
+        });
+    });
+
     test('GET /recent returns recent logs', async () => {
       activityLogService.getRecentActivityLogs.mockResolvedValue([{ action: 'CREATE' }]);
       const app = buildApp(activityLogRoutes);
@@ -235,6 +441,32 @@ describe('controller integration routes', () => {
 
       expect(activityLogService.getRecentActivityLogs).toHaveBeenCalledWith('5');
     });
+
+    test('GET /module/:module returns module logs', async () => {
+      activityLogService.getActivityLogsByModule.mockResolvedValue([{ module: 'teacher' }]);
+      const app = buildApp(activityLogRoutes);
+
+      await request(app)
+        .get('/module/teacher')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual([{ module: 'teacher' }]);
+        });
+
+      expect(activityLogService.getActivityLogsByModule).toHaveBeenCalledWith('teacher');
+    });
+
+    test('GET /:id returns a log entry', async () => {
+      activityLogService.getActivityLogById.mockResolvedValue({ action: 'UPDATE' });
+      const app = buildApp(activityLogRoutes);
+
+      await request(app)
+        .get('/log-1')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ action: 'UPDATE' });
+        });
+    });
   });
 
   describe('category routes', () => {
@@ -247,6 +479,59 @@ describe('controller integration routes', () => {
         .expect(200)
         .expect(({ body }) => {
           expect(body).toEqual([{ name: 'CNTT' }]);
+        });
+    });
+
+    test('POST / creates a category', async () => {
+      Category.create.mockResolvedValue({ name: 'Khoa CNTT' });
+      const app = buildApp(categoryRoutes);
+
+      await request(app)
+        .post('/')
+        .send({ name: 'Khoa CNTT' })
+        .expect(201)
+        .expect(({ body }) => {
+          expect(body).toEqual({ name: 'Khoa CNTT' });
+        });
+    });
+
+    test('POST /seed seeds default categories when empty', async () => {
+      Category.countDocuments.mockResolvedValue(0);
+      Category.insertMany.mockResolvedValue([]);
+      const app = buildApp(categoryRoutes);
+
+      await request(app)
+        .post('/seed')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body.message).toBe('Seeded default categories.');
+        });
+
+      expect(Category.insertMany).toHaveBeenCalled();
+    });
+
+    test('PUT /:id updates a category', async () => {
+      Category.findByIdAndUpdate.mockResolvedValue({ name: 'CNTT Updated' });
+      const app = buildApp(categoryRoutes);
+
+      await request(app)
+        .put('/cat-1')
+        .send({ name: 'CNTT Updated' })
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ name: 'CNTT Updated' });
+        });
+    });
+
+    test('DELETE /:id deletes a category', async () => {
+      Category.findByIdAndDelete.mockResolvedValue({ name: 'CNTT' });
+      const app = buildApp(categoryRoutes);
+
+      await request(app)
+        .delete('/cat-1')
+        .expect(200)
+        .expect(({ body }) => {
+          expect(body).toEqual({ message: 'Category deleted successfully.' });
         });
     });
 
