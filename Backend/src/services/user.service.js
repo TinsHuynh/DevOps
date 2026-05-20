@@ -39,7 +39,7 @@ const verifyPassword = (password, salt, expectedHash) => {
 const normalizeUserPayload = (payload = {}) => ({
   username: String(payload.username || '').trim().toLowerCase(),
   fullName: String(payload.fullName || '').trim(),
-  role: payload.role || 'student',
+  role: payload.role,
   status: payload.status || 'active',
   password: payload.password || '',
 });
@@ -51,6 +51,10 @@ const buildPasswordFields = (password, existingSalt) => {
 
 const createUser = async (payload) => {
   const normalized = normalizeUserPayload(payload);
+  // Ensure default role is student when not provided during creation
+  if (!normalized.role) {
+    normalized.role = 'student';
+  }
 
   if (!normalized.username || !normalized.fullName || !normalized.password) {
     throw new Error('username, fullName, and password are required');
@@ -216,7 +220,7 @@ const seedDefaultUsers = async () => {
             fullName: item.fullName,
             role: item.role,
             status: item.status,
-            ...passwordFields,
+            // Do NOT reset passwordHash/passwordSalt for existing users
           },
         },
       );

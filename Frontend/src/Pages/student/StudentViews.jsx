@@ -363,7 +363,21 @@ export const StudentPasswordView = () => {
       return;
     }
     try {
-      await userService.updateUser(currentUser._id, { password: form.newPassword });
+      let targetUserId = currentUser?._id;
+      if (!targetUserId) {
+        const usersList = await userService.fetchUsers();
+        const userObj = usersList.find(u => u.username === currentUser?.username);
+        if (userObj) {
+          targetUserId = userObj._id;
+        }
+      }
+
+      if (!targetUserId) {
+        toast('Không tìm thấy thông tin tài khoản người dùng.', 'error');
+        return;
+      }
+
+      await userService.updateUser(targetUserId, { password: form.newPassword });
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       toast('Đã đổi mật khẩu thành công.');
     } catch (err) {

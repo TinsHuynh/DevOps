@@ -63,6 +63,7 @@ export const AuthProvider = ({ children }) => {
 
     const nextSession = {
       user: {
+        _id: user._id,
         username: user.username,
         fullName: user.fullName,
         role: user.role,
