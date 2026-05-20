@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToastProvider } from '../components/common/ToastNotification';
+import { ToastProvider } from '../Components/common/ToastNotification';
 import { AuthProvider } from '../contexts/AuthContext';
 import AppRoutes from '../routes/AppRoutes';
 

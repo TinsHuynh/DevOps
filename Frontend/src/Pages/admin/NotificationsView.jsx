@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../../components/common/Modal';
-import { useToast } from '../../components/common/ToastNotification';
+import { useToast } from '../../Components/common/ToastNotification';
 import notificationService from '../../services/notificationService';
 
 const NotificationsView = () => {
