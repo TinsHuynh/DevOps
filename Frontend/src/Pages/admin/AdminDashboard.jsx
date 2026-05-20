@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AdminLayout from '../../components/layout/AdminLayout';
+import AdminLayout from '../../Components/layout/AdminLayout';
 import StudentsView from './StudentsView';
 import AccountsView from './AccountsView';
 import NotificationsView from './NotificationsView';

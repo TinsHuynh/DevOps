@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from '../../components/common/Modal';
+import Modal from '../../Components/common/Modal';
 import { useToast } from '../../Components/common/ToastNotification';
 import notificationService from '../../services/notificationService';
 

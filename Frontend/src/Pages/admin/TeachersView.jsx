@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import Modal from '../../components/common/Modal';
-import StatsCard from '../../components/common/StatsCard';
-import { useToast } from '../../components/common/ToastNotification';
+import Modal from '../../Components/common/Modal';
+import StatsCard from '../../Components/common/StatsCard';
+import { useToast } from '../../Components/common/ToastNotification';
 import TeacherForm from '../../features/teacher/components/TeacherForm';
 import TeacherTable from '../../features/teacher/components/TeacherTable';
 import teacherService from '../../services/teacherService';

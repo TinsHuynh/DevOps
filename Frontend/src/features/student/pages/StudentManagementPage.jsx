@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import DashboardLayout from '../../../components/layout/DashboardLayout';
-import Header from '../../../components/layout/Header';
-import StatsCard from '../../../components/common/StatsCard';
-import Modal from '../../../components/common/Modal';
-import { useToast } from '../../../components/common/ToastNotification';
+import DashboardLayout from '../../../Components/layout/DashboardLayout';
+import Header from '../../../Components/layout/Header';
+import StatsCard from '../../../Components/common/StatsCard';
+import Modal from '../../../Components/common/Modal';
+import { useToast } from '../../../Components/common/ToastNotification';
 import StudentForm from '../components/StudentForm';
 import StudentTable from '../components/StudentTable';
 import studentService from '../services/studentService';

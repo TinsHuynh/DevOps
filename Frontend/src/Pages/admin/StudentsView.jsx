@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import Modal from '../../components/common/Modal';
-import StatsCard from '../../components/common/StatsCard';
-import { useToast } from '../../components/common/ToastNotification';
+import Modal from '../../Components/common/Modal';
+import StatsCard from '../../Components/common/StatsCard';
+import { useToast } from '../../Components/common/ToastNotification';
 import StudentForm from '../../features/student/components/StudentForm';
 import StudentTable from '../../features/student/components/StudentTable';
 import studentService from '../../features/student/services/studentService';

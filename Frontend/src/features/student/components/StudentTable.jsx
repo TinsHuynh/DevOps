@@ -1,5 +1,5 @@
 import React from 'react';
-import Badge from '../../../components/common/Badge';
+import Badge from '../../../Components/common/Badge';
 
 const StudentTable = ({ students, onEdit, onDelete }) => {
   if (!students || students.length === 0) {
