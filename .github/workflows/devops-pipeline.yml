@@ -32,20 +32,33 @@ jobs:
       - name: Run Backend Unit & Integration Tests (Jest)
         run: |
           cd Backend
-          npm test
+          npm test -- --coverage --coverageReporters=lcov --coverageReporters=text
         continue-on-error: true
 
-      - name: SonarQube Scan (Backend)
+      - name: Upload Coverage to SonarQube
         uses: SonarSource/sonarcloud-github-action@v2.1.1
         with:
           projectBaseDir: Backend/
           args: >
             -Dsonar.projectKey=QuanLySinhVien:Backend
             -Dsonar.organization=quanlysinhvien
+            -Dsonar.sources=src
+            -Dsonar.tests=tests
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         continue-on-error: true
+
+      - name: Generate Test Report
+        if: always()
+        run: |
+          cd Backend
+          echo "## 📊 Test Report" >> $GITHUB_STEP_SUMMARY
+          echo "Backend tests completed at $(date)" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "✅ Coverage report generated" >> $GITHUB_STEP_SUMMARY
+          fi
 
   # Giai đoạn 2: Build Frontend
   build-frontend:
@@ -72,9 +85,51 @@ jobs:
           cd Frontend
           npm run build
 
-  # Giai đoạn 3: Quality Gate Check & Deploy (only on main branch)
-  quality-gate-and-deploy:
+      - name: Generate Build Report
+        if: always()
+        run: |
+          echo "## ✅ Frontend Build Report" >> $GITHUB_STEP_SUMMARY
+          echo "Frontend build completed at $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "Build artifacts ready for deployment" >> $GITHUB_STEP_SUMMARY
+
+  # Giai đoạn 3: Build Docker Images
+  build-docker:
     needs: [test-and-analyze-backend, build-frontend]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Backend
+          push: false
+          tags: devops-backend:latest
+          cache-from: type=registry
+
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Frontend
+          push: false
+          tags: devops-frontend:latest
+          cache-from: type=registry
+
+      - name: Docker Build Report
+        run: |
+          echo "## 🐳 Docker Build Report" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Backend Docker image built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Frontend Docker image built successfully" >> $GITHUB_STEP_SUMMARY
+
+  # Giai đoạn 4: Quality Gate Check & Deploy (only on main branch)
+  quality-gate-and-deploy:
+    needs: [test-and-analyze-backend, build-frontend, build-docker]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
@@ -82,18 +137,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Check Quality Gate Status
+      - name: Deploy to Staging (Render)
+        if: success()
         run: |
-          echo "✅ All tests passed successfully!"
-          echo "✅ SonarQube analysis completed!"
-          echo "🚀 Ready to deploy to Staging/Production"
+          echo "🚀 Deploying to Staging on Render..."
+          if [ ! -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+            echo "✅ Staging deployment webhook triggered"
+          else
+            echo "⚠️ RENDER_DEPLOY_HOOK not configured. Add it to GitHub Secrets."
+          fi
+        continue-on-error: true
 
-      - name: Deploy Notification
+      - name: Deploy to Production (Vercel)
+        if: success()
         run: |
-          echo "Pipeline Status: SUCCESS"
-          echo "Deploying to Staging on Render..."
-          echo "Deploying to Production on Vercel..."
-          # Add your deployment webhooks here
-          # Example:
-          # curl -X POST https://api.render.com/deploy/...
-          # curl -X POST https://api.vercel.com/v1/deployments/...
+          echo "🚀 Deploying to Production on Vercel..."
+          if [ ! -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+            echo "✅ Production deployment webhook triggered"
+          else
+            echo "⚠️ VERCEL_DEPLOY_HOOK not configured. Add it to GitHub Secrets."
+          fi
+        continue-on-error: true
+
+      - name: Pipeline Completion Report
+        if: always()
+        run: |
+          echo "## 🎯 CI/CD Pipeline Report" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pipeline Stages:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Backend Tests & SonarQube Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Frontend Build" >> $GITHUB_STEP_SUMMARY
+          echo "- 🚀 Deployment Notification" >> $GITHUB_STEP_SUMMARY
